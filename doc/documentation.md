@@ -28,6 +28,18 @@ If you know the value of the timestamp and just want the values of the nodes wit
 
 *Note:
 You will see null if you haven’t specified the key or the key doesn’t exist. 
+=======
+There are also handy web pages to help you with debugging. If you didn't change the default http port, 7451, you can access the web pages by prepending http://localhost:7451/ to the title of the following subtitles. For example, http://localhost:7451/GET 
+
+**GET**
+It returns the tree in hash map format. 
+You can also access an individual value. For example, say if you want to find the value under key = â€œcart.seafood.basket1â€, enter http://localhost:7451/GET?key=cart.seafood.basket1 in your browser.
+Wildcards are also accepted. For example, you can do http://localhost:7451/GET?key=cart.seafood.* or http://localhost:7451/GET?key=*.*.* 
+If you know the value of the timestamp and just want the values of the nodes with the timestamp, you can add parameter â€œtâ€. For example, http://localhost:7451/GET?key=cart.seafood.basket1&t=1404148628.
+
+*Note:
+You will see null if you haven't specified the key or the key doesn't exist. 
+
 Make sure that you have already inserted it in the tree.
 The garbage collector deletes nodes in the tas server that have a timestamp 60 seconds older than the current time by default. You can make your timestamp far away in the future to prevent the garbage collector from deleting the data before you read it on the GET page.
 *
@@ -63,6 +75,7 @@ The bar graph is generated using [dimple](http://dimplejs.org/) based on the [Ho
 TAS stores, organizes and deletes data using tree structure. A simple way of understanding TAS’s storage system is by imagining 2 different trees. One which represents the data itself with root *dataNode* and a smaller tree to make garbage collecting efficient with root *timestampNode*.
 
 The tree with the root dataNode is used to structure the data. If a user inputs *INCR 1404313845 Hello.World 5* and *INCR 1404313885 Hello.Again 10*, the tree would be stored like the diagram below. Each level in key is separated by “.”
+
 ![tree structure diagram1](./images/treestruct1.png)
 
 The tree with the root as timestampNode is designed for the sole purpose of garbage collection. The leaf nodes of timestampNode reference to the leaf nodes of dataNode. For the same input, the tree for garbage collector would be like this:
