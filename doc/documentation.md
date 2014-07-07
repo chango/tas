@@ -71,24 +71,3 @@ The tree with the root as timestampNode is designed for the sole purpose of garb
 
 #Garbage Collector
 The TAS Garbage Collector(GC) treats everything older than 60 seconds of the current time as expired data. At roughly every 5 seconds, the GC deletes data in the tree that is exactly 60 seconds older than the current time. For example, say the garbage collector runs at time 10000, only the nodes with timestamp at exactly 9940 will be deleted. The nodes with timestamp older than 9940 will be ignored. The GC will delete all the other expired nodes when the timestamp is divisible by 8. The GC does not traverse the tree and deletes expired nodes every time to eliminate the number of times of traversing a potentially very large tree.
-
-
-**DIAG**
-It displays three values:
-1. gc_running: Indicates whether the garbage collector is running.
-2. num_leafs: The number of leafs in the tree.
-3. oldest_timestamp: The oldest timestamp in the tree.
-
-**TREE**
-It returns you the tree representation of your data.
-![TREE](./images/Tree.png)
-
-The leaf nodes store the value and its timestamp. All leaf nodes are represented with an unfilled circle. A node which can be expanded is represented by a filled circle. 
-The key of the leaf node is stored in the branch from root to the leaf node. For example, in the graph above, there are two nodes with the same value of 6 and timestamp of 1404308905. However, their keys are different. One has key dataroot.burgerking. The other has dataroot.burgerking.info.news.
-
-The tree visualization is created using [D3.js](http://d3js.org/) based on this [example](http://bl.ocks.org/mbostock/4339083).
-
-**STATS**
-The page shows the number of nodes for each timestamp in the tree.
-![Graph](./images/graph.png)
-The bar graph is generated using [dimple](http://dimplejs.org/) based on the [Horizontal Bar](http://dimplejs.org/examples_viewer.html?id=bars_horizontal) example.
