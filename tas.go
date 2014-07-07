@@ -195,6 +195,25 @@ func main() {
 	    }
 	})
 
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		t := template.New("Main")
+		t, err := t.ParseFiles("main.html")
+
+		//Throw out error 
+		if err != nil {
+		    fmt.Fprint(w, "Error parsing file")
+		    return
+		}
+
+		err = t.ExecuteTemplate(w, "main.html", nil)
+
+		//Throw out error 
+		if err != nil {
+		    fmt.Fprint(w, "Error parsing file")
+		    return
+		}
+	})
+
 	log.Println(fmt.Sprintf("HTTP listening on %s...", httpPort))
 	log.Fatal(http.ListenAndServe("0.0.0.0:"+httpPort, nil))
 }

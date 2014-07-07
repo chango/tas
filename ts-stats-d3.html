@@ -1,26 +1,19 @@
 <style>
-  #tableContainer{
-    vertical-align: top;
-    width:80%;
-  }
-  td{
-    padding: 10px;
+  #info{
+    width: 80%;
+    display: inline;
+    margin-left: 20%;
+    margin-right: 20%;
   }
 </style>
 
 <!DOCTYPE html>
 <html>
-  <div id="tableContainer" align="center">
-    <table>
-      <tr>
-        <td>time: </td>
-        <td id="server_time"></td>
-        <td></td><td></td><td></td><td></td>
-        <td><input type="button" onclick="pause_resume()" value="pause" id="pause_resume"></td>
-      </tr>
-    </table>
+  <div id="info">
+        <label align="left">time: </label>
+        <label id="server_time"></label>
+        <input type="button" onclick="pause_resume()" value="pause" id="pause_resume" style="margin-left: 100px;">
   </div>
-</html>
 
 <div id="chartContainer">
   <script src="http://d3js.org/d3.v3.min.js"></script>
@@ -95,3 +88,5 @@
     };
   </script>
 </div>
+
+</html>
