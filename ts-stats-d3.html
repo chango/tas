@@ -1,0 +1,97 @@
+<style>
+  #tableContainer{
+    vertical-align: top;
+    width:80%;
+  }
+  td{
+    padding: 10px;
+  }
+</style>
+
+<!DOCTYPE html>
+<html>
+  <div id="tableContainer" align="center">
+    <table>
+      <tr>
+        <td>time: </td>
+        <td id="server_time"></td>
+        <td></td><td></td><td></td><td></td>
+        <td><input type="button" onclick="pause_resume()" value="pause" id="pause_resume"></td>
+      </tr>
+    </table>
+  </div>
+</html>
+
+<div id="chartContainer">
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script src="http://dimplejs.org/dist/dimple.v2.0.0.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script type="text/javascript">
+    
+    var svg = dimple.newSvg("#chartContainer", "100%", "100%");
+    var ts_counts = [{{template "TS_COUNTS"}}];
+
+    var ajax_data = getData();
+    document.getElementById("server_time").innerHTML=ajax_data[1];
+    var js_string = "{ \"data\": [".concat(ajax_data[0], "]}")
+    var js = JSON.parse(js_string)
+    
+
+
+    var myChart = new dimple.chart(svg, []);
+    myChart.data = js.data
+
+    var x = myChart.addMeasureAxis("x", "count");
+    var y = myChart.addCategoryAxis("y", "timestamp");
+    y.addOrderRule("timestamp");
+    var s = myChart.addSeries(null, dimple.plot.area);
+    s.interpolation = "step";
+    s.lineWeight = 1;
+    myChart.draw();
+
+    function refresh(myChart) {
+        
+          var ajax_data = getData();
+
+          document.getElementById("server_time").innerHTML=ajax_data[1];
+
+          var js_string = "{ \"data\": [".concat(ajax_data[0], "]}")
+          var js = JSON.parse(js_string)
+          myChart.data = js.data
+          myChart.draw(1000);
+    }
+
+
+
+    var myVar = setInterval(function(){refresh(myChart)},1000);
+    var isPaused = false;
+    function pause_resume(){
+      if(!isPaused){  //pause is clicked
+        clearInterval(myVar)
+        document.getElementById("pause_resume").value="resume";
+        isPaused = true;
+      }else{  //resume is clicked
+        myVar = setInterval(function(){refresh(myChart)},1000);
+        document.getElementById("pause_resume").value="pause";
+        isPaused = false;
+      }
+    }
+
+    function getData() {
+        var result = null
+        var server_time = 0
+        $.ajax({
+          url: "http://localhost:7451/DIAG",
+          type: 'get',
+          dataType: 'html',
+          async: false,
+          success: function(data){
+            var js = JSON.parse(data);
+            result = js.ts_counts;
+            server_time = js.current_time;
+          }
+        });
+      return [result, server_time];
+    };
+  </script>
+</div>
