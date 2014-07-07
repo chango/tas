@@ -108,6 +108,6 @@ go run hellotas.go
 ```
 ----
 #Documentation
-The documentation can be found [here](./documentation.md).
+The documentation can be found [here](./doc/documentation.md).
 
 
