@@ -18,7 +18,7 @@ If you create new data using APPEND with a key, the program will ignore any subs
 *
 
 #Options/Configurations
-There are also handy web pages to help you with debugging. If you didn’t change the default http port, 7451, you can access the web pages by prepending http://localhost:7451/ to the title of the following subtitles. For example, http://localhost:7451/GET 
+There are also handy web pages to help you with debugging. If you didn’t change the default http port, 7451, you can check them out at http://localhost:7451/
 
 **GET**
 It returns the tree in hash map format. 
@@ -26,19 +26,8 @@ You can also access an individual value. For example, say if you want to find th
 Wildcards are also accepted. For example, you can do http://localhost:7451/GET?key=cart.seafood.* or http://localhost:7451/GET?key=*.*.* 
 If you know the value of the timestamp and just want the values of the nodes with the timestamp, you can add parameter “t”. For example, http://localhost:7451/GET?key=cart.seafood.basket1&t=1404148628.
 
-*Note:You will see null if you haven’t specified the key or the key doesn’t exist. 
-
-There are also handy web pages to help you with debugging. If you didn't change the default http port, 7451, you can access the web pages by prepending http://localhost:7451/ to the title of the following subtitles. For example, http://localhost:7451/GET 
-
-**GET**
-It returns the tree in hash map format. 
-You can also access an individual value. For example, say if you want to find the value under key = â€œcart.seafood.basket1â€, enter http://localhost:7451/GET?key=cart.seafood.basket1 in your browser.
-Wildcards are also accepted. For example, you can do http://localhost:7451/GET?key=cart.seafood.* or http://localhost:7451/GET?key=*.*.* 
-If you know the value of the timestamp and just want the values of the nodes with the timestamp, you can add parameter â€œtâ€. For example, http://localhost:7451/GET?key=cart.seafood.basket1&t=1404148628.
-
 *Note:
-You will see null if you haven't specified the key or the key doesn't exist. 
-
+You will see null if you haven’t specified the key or the key doesn’t exist. 
 Make sure that you have already inserted it in the tree.
 The garbage collector deletes nodes in the tas server that have a timestamp 60 seconds older than the current time by default. You can make your timestamp far away in the future to prevent the garbage collector from deleting the data before you read it on the GET page.
 *
