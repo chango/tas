@@ -58,7 +58,6 @@ It returns you the tree representation of your data. You can click at the node t
 ![TREE](./images/Tree.png)
 
 The leaf nodes store the value and its timestamp. All leaf nodes are represented with an unfilled circle. A node which can be expanded is represented by a filled circle. 
-The key of the leaf node is stored in the branch from root to the leaf node. For example, in the graph above, there are two nodes with the same value of 6 and timestamp of 1404308905. However, their keys are different. One has key dataroot.burgerking. The other has dataroot.burgerking.info.news.
 
 The tree visualization is created using [D3.js](http://d3js.org/) based on this [example](http://bl.ocks.org/mbostock/4339083).
 
@@ -81,4 +80,4 @@ The leaf nodes of the tree for garbage collector reference to the leaf nodes of 
 ![tree structure diagram2](./images/treestruct2.png)
 
 #Garbage Collector
-The TAS Garbage Collector(GC) treats everything older than 60 seconds of the current time as expired data. At roughly every 5 seconds interval, the GC deletes data in the tree that is exactly 60 seconds older than the current time. For example, say the garbage collector runs at time 10000, only the nodes with timestamp at exactly 9940 will be deleted. The nodes with timestamp older than 9940 will be ignored. The GC will delete all the other expired nodes when the timestamp is divisible by 8. The GC does not traverse the tree and deletes expired nodes every 5 seconds to reduce the number of times of traversing a potentially very large tree.
+The TAS Garbage Collector(GC) treats everything older than 60 seconds of the current time as expired data. At roughly every 5 seconds interval, the GC deletes data in the tree that is expired.
