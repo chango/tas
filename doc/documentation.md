@@ -14,8 +14,7 @@ You can send the commands to TAS server using a TCP push socket. The message to 
 - VALUE: VALUE must be integer when using INCR and a slice when using APPEND. It’s recommended that you encode VALUE using json when it’s a slice.
 
 *Note:
-If you create new data using APPEND with a key, the program will ignore any subsequent INCR command with the same key. This is because the key for APPEND is a slice, whereas the key for INCR is an int. The same applies to INCR. If you create new data using INCR with a key first, any subsequent APPEND request to the same key will be ignored.
-*
+If you create new data using APPEND with a key, the program will ignore any subsequent INCR command with the same key. This is because the key for APPEND is a slice, whereas the key for INCR is an int. The same applies to INCR. If you create new data using INCR with a key first, any subsequent APPEND request to the same key will be ignored.*
 
 #Options/Configurations
 There are also handy web pages to help you with debugging. If you didn’t change the default http port, 7451, you can check them out at http://localhost:7451/
@@ -36,14 +35,12 @@ If you know the value of the timestamp and just want the values of the nodes wit
 *Note:
 You will see null if you haven’t specified the key or the key doesn’t exist. 
 Make sure that you have already inserted it in the tree.
-The garbage collector deletes nodes in the tas server that have a timestamp 60 seconds older than the current time by default. You can make your timestamp far away in the future to prevent the garbage collector from deleting the data before you read it on the GET page.
-*
+The garbage collector deletes nodes in the tas server that have a timestamp 60 seconds older than the current time by default. You can make your timestamp far away in the future to prevent the garbage collector from deleting the data before you read it on the GET page.*
 
 When there are more than one timestamp with the same key, the returned value is calculated using (sum of all values with the same key)/[(the number of nodes) x interval\_second]. The interval\_second by default is 5 seconds. This is feature is useful if you want to see the average over an interval. You can change the interval\_second using parameter "i". For example, http://localhost:7451/GET?key=cart.seafood.basket1&i=2 will change interval\_second to 2 for the duration of the GET request.
 
 *Note:
-The i parameter only applies to data stored using INCR because they are int. The equation (sum of all values with the same key)/[(the number of nodes) x interval\_second] will not be applied to data stored using APPEND.
-*
+The i parameter only applies to data stored using INCR because they are int. The equation (sum of all values with the same key)/[(the number of nodes) x interval\_second] will not be applied to data stored using APPEND.*
 
 **[ip addr]:[http port]/DIAG**
 It displays three values:
