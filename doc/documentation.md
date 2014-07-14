@@ -20,7 +20,7 @@ If you create new data using APPEND with a key, the program will ignore any subs
 #Options/Configurations
 There are also handy web pages to help you with debugging. If you didn’t change the default http port, 7451, you can check them out at http://localhost:7451/
 
-**{ip addr}:{http port}/**
+**[ip addr]:[http port]/**
 This is the navigation page.
 ![Navigation](./images/Navigation.png)
 
@@ -54,7 +54,7 @@ It displays three values:
 ![DIAG](./images/DIAG.png)
 
 **[ip addr]:[http port]/TREE**
-It returns you the tree representation of your data.
+It returns you the tree representation of your data. You can click at the node to expand it.
 ![TREE](./images/Tree.png)
 
 The leaf nodes store the value and its timestamp. All leaf nodes are represented with an unfilled circle. A node which can be expanded is represented by a filled circle. 
@@ -64,7 +64,9 @@ The tree visualization is created using [D3.js](http://d3js.org/) based on this 
 
 **[ip addr]:[http port]/STATS**
 The page shows the number of nodes for each timestamp in the tree.
+
 ![Graph](./images/graph.png)
+
 The bar graph is generated using [dimple](http://dimplejs.org/) based on the [Horizontal Bar](http://dimplejs.org/examples_viewer.html?id=bars_horizontal) example.
 
 #Tree Structure
@@ -75,6 +77,7 @@ The tree with the root dataNode is used to structure the data. If a user inputs 
 ![tree structure diagram1](./images/treestruct1.png)
 
 The tree with the root as timestampNode is designed for the sole purpose of garbage collection. The leaf nodes of timestampNode reference to the leaf nodes of dataNode. For the same input, the tree for garbage collector would be like this:
+
 ![tree structure diagram2](./images/treestruct2.png)
 
 
