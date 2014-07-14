@@ -70,16 +70,15 @@ The page shows the number of nodes for each timestamp in the tree.
 The bar graph is generated using [dimple](http://dimplejs.org/) based on the [Horizontal Bar](http://dimplejs.org/examples_viewer.html?id=bars_horizontal) example.
 
 #Tree Structure
-TAS stores, organizes and deletes data using tree structure. A simple way of understanding TAS’s storage system is by imagining 2 different trees. One which represents the data itself with root *dataNode* and a smaller tree to make garbage collecting efficient with root *timestampNode*.
+TAS stores, organizes and deletes data using a tree structure. A simple way of understanding TAS’s storage system is by imagining 2 different trees. One which represents the data itself and a smaller tree to make garbage collecting efficient with root.
 
-The tree with the root dataNode is used to structure the data. If a user inputs *INCR 1404313845 Hello.World 5* and *INCR 1404313885 Hello.Again 10*, the tree would be stored like the diagram below. Each level in key is separated by “.”
+If a user inputs *INCR 1404313845 Hello.World 5* and *INCR 1404313885 Hello.Again 10*, the tree that represents data would be stored like the diagram below. Each level in key is separated by “.”
 
 ![tree structure diagram1](./images/treestruct1.png)
 
-The tree with the root as timestampNode is designed for the sole purpose of garbage collection. The leaf nodes of timestampNode reference to the leaf nodes of dataNode. For the same input, the tree for garbage collector would be like this:
+The leaf nodes of the tree for garbage collector reference to the leaf nodes of the tree that represents data. For the same input, the tree for garbage collector would be like this:
 
 ![tree structure diagram2](./images/treestruct2.png)
 
-
 #Garbage Collector
-The TAS Garbage Collector(GC) treats everything older than 60 seconds of the current time as expired data. At roughly every 5 seconds, the GC deletes data in the tree that is exactly 60 seconds older than the current time. For example, say the garbage collector runs at time 10000, only the nodes with timestamp at exactly 9940 will be deleted. The nodes with timestamp older than 9940 will be ignored. The GC will delete all the other expired nodes when the timestamp is divisible by 8. The GC does not traverse the tree and deletes expired nodes every time to eliminate the number of times of traversing a potentially very large tree.
+The TAS Garbage Collector(GC) treats everything older than 60 seconds of the current time as expired data. At roughly every 5 seconds interval, the GC deletes data in the tree that is exactly 60 seconds older than the current time. For example, say the garbage collector runs at time 10000, only the nodes with timestamp at exactly 9940 will be deleted. The nodes with timestamp older than 9940 will be ignored. The GC will delete all the other expired nodes when the timestamp is divisible by 8. The GC does not traverse the tree and deletes expired nodes every 5 seconds to reduce the number of times of traversing a potentially very large tree.
