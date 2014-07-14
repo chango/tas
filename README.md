@@ -24,7 +24,7 @@ The data in TAS is stored for approximately a minute, the idea is to track curre
   *Note: TAS hasn’t been tested on Go 1.3.*  
 2. 
 Install the zmq2 library from github:
-```go get github/com/pebbe/zmq2 ```
+```go get github.com/pebbe/zmq2 ```
 3. Download the TAS package, run:
 ```go get github.com/chango/tas```
 
