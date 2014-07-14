@@ -1,7 +1,10 @@
 
 #Abstract
 
-True Air Speed aka Tree Avoidance System, a lightweight system to track and analyze real-time data.
+TAS stands for True Air Speed. It is a lightweight system to track and analyze real time data. 
+TAS is able to handle a lot of incoming data, create visuals to analyze it and take snapshots to furthur examine the data at a specific time. 
+
+The data in TAS is stored for approximately a minute, the idea is to track current trends and analyze real time data while keeping the system light weight. 
 
 
 #Prerequisites
