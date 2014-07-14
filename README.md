@@ -39,7 +39,7 @@ The server has to be up and running first. For UNIX-like systems, type the follo
 ```
 go run tas.go
 ```
-On a separate terminal, run **hellotas.go** by switching to the examples directory. Then run the code by typing the command:
+On a separate terminal, run **hellotas.go** by switching to the examples directory and entering the following command:
 ```
 go run hellotas.go
 ```
