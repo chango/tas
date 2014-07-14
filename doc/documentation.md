@@ -4,7 +4,7 @@ TAS stands for True Air Speed, or you can call it Tree Avoidance System. It is a
 TAS is useful if you have a lot of incoming traffic to your website and want to automatically delete the information that has been longer than 60 seconds.
 
 #Commands
-You can send the commands to TAS server through a TCP connection. The incoming message to TAS server needs to be a string in the following format:
+You can send the commands to TAS server using a TCP push socket. The message to TAS server needs to be a string in the following format:
 	INCR/APPEND TIMESTAMP KEY VALUE
 
 - INCR: increments the value under the KEY with VALUE. 
