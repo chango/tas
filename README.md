@@ -42,13 +42,13 @@ go run hellotas.go
 ```
 Open any modern web browser and go to the following addresses to see the output of TAS:
 
-1. localhost:7451/DIAG
+- localhost:7451/DIAG            
 
-2. localhost:7451/TREE
+- localhost:7451/TREE             
 
-3. localhost:7451/STATS
+- localhost:7451/STATS          
 
-4. localhost:7451/GET?key=*.*.*.*
+- localhost:7451/GET?key=\*.\*.\*.\*
 
 ----
 #Documentation
