@@ -20,9 +20,15 @@ If you create new data using APPEND with a key, the program will ignore any subs
 #Options/Configurations
 There are also handy web pages to help you with debugging. If you didn’t change the default http port, 7451, you can check them out at http://localhost:7451/
 
+**{ip addr}:{http port}/**
+This is the navigation page.
+
+
 **{ip addr}:{http port}/GET**
 It returns the tree in hash map format. 
 You can also access an individual value. For example, say if you want to find the value under key = “cart.seafood.basket1”, enter http://localhost:7451/GET?key=cart.seafood.basket1 in your browser.
+![GET](./images/GET.png)
+
 Wildcards are also accepted. For example, you can do http://localhost:7451/GET?key=cart.seafood.* or http://localhost:7451/GET?key=*.*.* 
 If you know the value of the timestamp and just want the values of the nodes with the timestamp, you can add parameter “t”. For example, http://localhost:7451/GET?key=cart.seafood.basket1&t=1404148628.
 
@@ -44,6 +50,7 @@ It displays three values:
 2. num_leafs: The number of leafs in the tree.
 3. oldest_timestamp: The oldest timestamp in the tree.
 4. ts_counts: A map of timestamps and their corresponding value.
+![DIAG](./images/DIAG.png)
 
 **{ip addr}:{http port}/TREE**
 It returns you the tree representation of your data.
