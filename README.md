@@ -10,14 +10,6 @@ True Air Speed aka Tree Avoidance System, a lightweight system to track and anal
 
 2. zmq2 package must also be installed.
 
-#Usage
-TAS is useful if you are looking for code that can store information in a tree and automatically deletes the expired information.
-
-Some applications of TAS include
-
-- storing the users’ shopping history
-- real-time display of stock market trends
-- displaying live tweets
 
 #Getting Started
 
@@ -36,8 +28,8 @@ go get github/com/pebbe/zmq2
 
 3. Download the TAS package, run:
 ```
-hg clone ssh://hg@bitbucket.org/chango/atc
-cd atc/tas
+git clone https://github.com/chango/tas.git
+
 ```
 ----
 ###Example
@@ -45,8 +37,7 @@ cd atc/tas
 
 The server has to be up and running first. For UNIX-like systems, type the following commands in terminal:
 ```
-cd tas
-go run tas.go
+go run tas/tas.go
 ```
 Create a file called hellotas.go and paste the following code:
 ```go
