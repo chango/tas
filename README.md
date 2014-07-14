@@ -37,7 +37,7 @@ git clone https://github.com/chango/tas.git
 
 The server has to be up and running first. For UNIX-like systems, type the following commands in terminal:
 ```
-go run tas/tas.go
+go run tas.go
 ```
 Create a file called hellotas.go and paste the following code:
 ```go
