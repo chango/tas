@@ -22,11 +22,12 @@ There are also handy web pages to help you with debugging. If you didn’t chang
 
 **{ip addr}:{http port}/**
 This is the navigation page.
+![Navigation](./images/Navigation.png)
 
-
-**{ip addr}:{http port}/GET**
+**[ip addr]:[http port]/GET**
 It returns the tree in hash map format. 
-You can also access an individual value. For example, say if you want to find the value under key = “cart.seafood.basket1”, enter http://localhost:7451/GET?key=cart.seafood.basket1 in your browser.
+You can also access an individual value. For example, say if you want to find the value under key = “burgerking.Menu.Snacks”, enter http://localhost:7451/GET?key=cart.seafood.basket1 in your browser.
+
 ![GET](./images/GET.png)
 
 Wildcards are also accepted. For example, you can do http://localhost:7451/GET?key=cart.seafood.* or http://localhost:7451/GET?key=*.*.* 
@@ -44,7 +45,7 @@ When there are more than one timestamp with the same key, the returned value is 
 The i parameter only applies to data stored using INCR because they are int. The equation (sum of all values with the same key)/[(the number of nodes) x interval\_second] will not be applied to data stored using APPEND.
 *
 
-**{ip addr}:{http port}/DIAG**
+**[ip addr]:[http port]/DIAG**
 It displays three values:
 1. gc_running: Indicates whether the garbage collector is running.
 2. num_leafs: The number of leafs in the tree.
@@ -52,7 +53,7 @@ It displays three values:
 4. ts_counts: A map of timestamps and their corresponding value.
 ![DIAG](./images/DIAG.png)
 
-**{ip addr}:{http port}/TREE**
+**[ip addr]:[http port]/TREE**
 It returns you the tree representation of your data.
 ![TREE](./images/Tree.png)
 
@@ -61,7 +62,7 @@ The key of the leaf node is stored in the branch from root to the leaf node. For
 
 The tree visualization is created using [D3.js](http://d3js.org/) based on this [example](http://bl.ocks.org/mbostock/4339083).
 
-**{ip addr}:{http port}/STATS**
+**[ip addr]:[http port]/STATS**
 The page shows the number of nodes for each timestamp in the tree.
 ![Graph](./images/graph.png)
 The bar graph is generated using [dimple](http://dimplejs.org/) based on the [Horizontal Bar](http://dimplejs.org/examples_viewer.html?id=bars_horizontal) example.
