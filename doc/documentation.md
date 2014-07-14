@@ -4,13 +4,13 @@ TAS stands for True Air Speed, or you can call it Tree Avoidance System. It is a
 TAS is useful if you have a lot of incoming traffic to your website and want to automatically delete the information that has been longer than 60 seconds.
 
 #Commands
-The incoming message to TAS server needs to be in the following format:
+You can send the commands to TAS server through a TCP connection. The incoming message to TAS server needs to be a string in the following format:
 	INCR/APPEND TIMESTAMP KEY VALUE
 
 - INCR: increments the value under the KEY with VALUE. 
 - APPEND: appends the VALUE to an existing VALUE under KEY. 
-- TIMESTAMP: the timestamp must be a string representation of an integer in UNIX format.-
-- KEY: the path to where the tree is stored. Each level must be separated by a period. See section “Tree Structure” for more details.
+- TIMESTAMP: the timestamp must be a string representation of an integer in UNIX format.
+- KEY: the path to where the tree is stored. Each level must be separated by a period (ie/ Cart.Basket.BakeGoods). See section “Tree Structure” for more details.
 - VALUE: VALUE must be integer when using INCR and a slice when using APPEND. It’s recommended that you encode VALUE using json when it’s a slice.
 
 *Note:
@@ -20,7 +20,7 @@ If you create new data using APPEND with a key, the program will ignore any subs
 #Options/Configurations
 There are also handy web pages to help you with debugging. If you didn’t change the default http port, 7451, you can check them out at http://localhost:7451/
 
-**GET**
+**{ip addr}:{http port}/GET**
 It returns the tree in hash map format. 
 You can also access an individual value. For example, say if you want to find the value under key = “cart.seafood.basket1”, enter http://localhost:7451/GET?key=cart.seafood.basket1 in your browser.
 Wildcards are also accepted. For example, you can do http://localhost:7451/GET?key=cart.seafood.* or http://localhost:7451/GET?key=*.*.* 
@@ -38,14 +38,14 @@ When there are more than one timestamp with the same key, the returned value is 
 The i parameter only applies to data stored using INCR because they are int. The equation (sum of all values with the same key)/[(the number of nodes) x interval\_second] will not be applied to data stored using APPEND.
 *
 
-**DIAG**
+**{ip addr}:{http port}/DIAG**
 It displays three values:
 1. gc_running: Indicates whether the garbage collector is running.
 2. num_leafs: The number of leafs in the tree.
 3. oldest_timestamp: The oldest timestamp in the tree.
 4. ts_counts: A map of timestamps and their corresponding value.
 
-**TREE**
+**{ip addr}:{http port}/TREE**
 It returns you the tree representation of your data.
 ![TREE](./images/Tree.png)
 
@@ -54,7 +54,7 @@ The key of the leaf node is stored in the branch from root to the leaf node. For
 
 The tree visualization is created using [D3.js](http://d3js.org/) based on this [example](http://bl.ocks.org/mbostock/4339083).
 
-**STATS**
+**{ip addr}:{http port}/STATS**
 The page shows the number of nodes for each timestamp in the tree.
 ![Graph](./images/graph.png)
 The bar graph is generated using [dimple](http://dimplejs.org/) based on the [Horizontal Bar](http://dimplejs.org/examples_viewer.html?id=bars_horizontal) example.
