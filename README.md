@@ -9,9 +9,9 @@ The data in TAS is stored for approximately a minute, the idea is to track curre
 
 #Prerequisites
 
-1. Go 1.2.2 package must be installed on your computer.
+1. Go must be installed on your computer (*Note: TAS hasn't been tested on Go 1.5*)
 
-2. zmq2 package must also be installed.
+2. `github.com/pebbe/zmq3` package must also be installed.
 
 
 #Getting Started
@@ -19,14 +19,16 @@ The data in TAS is stored for approximately a minute, the idea is to track curre
 
 ###Installation
 
-1. Download the Go 1.2.2 package:http://golang.org/dl/ 
-  
-  *Note: TAS hasn’t been tested on Go 1.3.*  
-2. 
-Install the zmq2 library from github:
-```go get github.com/pebbe/zmq2 ```
-3. Download the TAS package, run:
+1. 
+Install the zmq3 library from github (if you have not already):
+```go get github.com/pebbe/zmq3```
+2. Download the TAS package, run:
 ```go get github.com/chango/tas```
+
+----
+###Notes
+
+There are some HTML templates that are in the `html` directory, the server will look for these to be in a directory named `html` in the root where the server is started.
 
 ----
 ###Example
@@ -34,7 +36,7 @@ Install the zmq2 library from github:
 
 The server has to be up and running first. For UNIX-like systems, type the following commands in terminal:
 ```
-go run $GOPATH/src/github.com/chango/tas/tas.go
+go run $GOPATH/src/github.com/chango/tas/examples/tas-server.go
 ```
 On a separate terminal, run **hellotas.go** by switching to the examples directory and entering the following command:
 ```
