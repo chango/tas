@@ -1,38 +1,56 @@
 package main
 
 import (
-	
 	"fmt"
-	zmq "github.com/pebbe/zmq2"
+	zmq "github.com/pebbe/zmq3"
+	"log"
 	"time"
 	//"strings"
-	"testing"
-	"net/http"
-	"io/ioutil"
 	"encoding/json"
-	"strconv"
+	"io/ioutil"
+	"net/http"
 	"regexp"
+	"strconv"
+	"testing"
+)
+
+import (
+	"github.com/chango/tas/tas"
 )
 
 const http_port = 7451
 const tcp_port = 7450
 
-func find_link(key string) string{
-	return "http://localhost:"+strconv.Itoa(http_port)+"/"+key
+func find_link(key string) string {
+	return "http://localhost:" + strconv.Itoa(http_port) + "/" + key
 }
 
-func ReadDiagServer(t *testing.T) (map[string]interface{}, interface{}){
+func NewTestingServer() *tas.TASServer {
+	c := tas.NewDefaultTASConfig()
+	svr, err := tas.NewTASServer(c)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return svr
+}
+
+func TestMain(m *testing.M) {
+	svr := NewTestingServer()
+	go svr.Run()
+}
+
+func ReadDiagServer(t *testing.T) (map[string]interface{}, interface{}) {
 	// Get the output from http://localhost:{tcp_port}/DIAG
 
 	// HTTP GET the /DIAG page
 	link := find_link("DIAG")
 	resp, err := http.Get(link)
-	defer resp.Body.Close()
 
-	if err != nil{
+	if err != nil {
 		t.Error(err)
 		return nil, err
 	}
+	defer resp.Body.Close()
 
 	// Read and return the output of HTTP GET
 	contents, _ := ioutil.ReadAll(resp.Body)
@@ -42,15 +60,15 @@ func ReadDiagServer(t *testing.T) (map[string]interface{}, interface{}){
 	return data, nil
 }
 
-func ReadGetServer(key string, t *testing.T) (map[string]interface{}, interface{}){
+func ReadGetServer(key string, t *testing.T) (map[string]interface{}, interface{}) {
 	// Get the output from http://localhost:{tcp_port}/GET?key={key}
 
 	// HTTP GET the /GET page
-	link := find_link("GET?key="+key)
+	link := find_link("GET?key=" + key)
 	resp, err := http.Get(link)
 	defer resp.Body.Close()
 
-	if err != nil{
+	if err != nil {
 		t.Error(err)
 		return nil, err
 	}
@@ -64,15 +82,15 @@ func ReadGetServer(key string, t *testing.T) (map[string]interface{}, interface{
 	// When there is wild card in the key string, data is the hash map
 	// ie/ data = map[cart:map[grocery:map[vegetables:map[basket:14]]]]
 	var wildcard = regexp.MustCompile(`[\*.]*\*`)
-	if (!wildcard.MatchString(key)){
+	if !wildcard.MatchString(key) {
 		var value interface{}
 		json.Unmarshal(contents, &value)
 		data[key] = value
 
-	}else{
+	} else {
 		json.Unmarshal(contents, &data)
 	}
-	
+
 	return data, nil
 }
 
@@ -84,77 +102,77 @@ func WaitForEmptyTree(t *testing.T) {
 	error := false
 
 	// Shows error if cannot read from /GET page or the garbage collector isn't running
-	if err_diag != nil || output_diag["gc_running"] != true{
+	if err_diag != nil || output_diag["gc_running"] != true {
 		error = true
-	}else{
+	} else {
 
 		// Waiting till there is no leaf in the tree
-		if int(output_diag["num_leafs"].(float64))>0{
+		if int(output_diag["num_leafs"].(float64)) > 0 {
 			fmt.Println("Waiting for tree to be empty using garbage collector...")
 		}
 
-		for int(output_diag["num_leafs"].(float64))>0{
-			time.Sleep(100*time.Millisecond)
+		for int(output_diag["num_leafs"].(float64)) > 0 {
+			time.Sleep(100 * time.Millisecond)
 			output_diag, err_diag = ReadDiagServer(t)
 
-			if err_diag != nil{
+			if err_diag != nil {
 				error = true
 			}
 		}
 	}
 
-	if (error){
+	if error {
 		t.Error("Garbage collector isn't running")
 	}
 }
 
-func WaitIfExists(key string, t *testing.T){
+func WaitIfExists(key string, t *testing.T) {
 	// Call WaitforEmptyTree() only if a leaf under key exists
 
 	output, _ := ReadGetServer(key, t)
-    value, _ := output[key]
-    if(value!=nil){
-    	WaitForEmptyTree(t)
-    }
+	value, _ := output[key]
+	if value != nil {
+		WaitForEmptyTree(t)
+	}
 }
 
-func FailHandler(fail bool, t *testing.T){
+func FailHandler(fail bool, t *testing.T) {
 	// Printing "CASE FAIL" and "CASE PASS" at the end of each test case
 
-	if (fail){
+	if fail {
 		fmt.Printf("FAIL\n")
 		t.FailNow()
-	}else{
+	} else {
 		fmt.Printf("PASS\n")
 	}
 }
 
-func SocketFailHandler(err interface{}, t *testing.T){
+func SocketFailHandler(err interface{}, t *testing.T) {
 	// Fail handler for connecting socket
 
 	if err != nil {
-    	fmt.Println(err)
-    	t.FailNow()
-    }
+		fmt.Println(err)
+		t.FailNow()
+	}
 }
 
-func SocketSendFailHandler(err interface{}, t *testing.T){
+func SocketSendFailHandler(err interface{}, t *testing.T) {
 	// Fail handler for sending message to the server
 
-	if err != nil{
+	if err != nil {
 		t.Error("Could not send input to server")
 	}
 
 	// Wait time for the server to update the tree
-	time.Sleep(5*time.Millisecond)
+	time.Sleep(5 * time.Millisecond)
 }
 
-func TestIncr(t *testing.T){
+func TestIncr(t *testing.T) {
 	// Generates unique keys and checks if the leafs are added correctly
 
 	// Socket connection setup
 	socket, _ := zmq.NewSocket(zmq.PUSH)
-	err := socket.Connect("tcp://localhost:"+strconv.Itoa(tcp_port))
+	err := socket.Connect("tcp://localhost:" + strconv.Itoa(tcp_port))
 	defer socket.Close()
 	SocketFailHandler(err, t)
 
@@ -164,9 +182,9 @@ func TestIncr(t *testing.T){
 	level1 := []string{"veg_section", "meat", "ready_food"}
 	level2 := []string{"basket1", "basket2", "basket3"}
 	level3 := []string{"item1", "item2"}
-	for _, key1 := range level1{
-		for _, key2 := range level2{
-			for _, key3 := range level3{
+	for _, key1 := range level1 {
+		for _, key2 := range level2 {
+			for _, key3 := range level3 {
 
 				// key insertion
 				now := time.Now().Unix()
@@ -179,11 +197,11 @@ func TestIncr(t *testing.T){
 				// Verifying output from /DIAG and /GET
 				output_diag, err_diag := ReadDiagServer(t)
 				num_leafs := int(output_diag["num_leafs"].(float64))
-				if (err_diag != nil || num_leafs != count) {
+				if err_diag != nil || num_leafs != count {
 					fmt.Printf("FAIL\n")
-					t.Error("Total number of leafs is", strconv.Itoa(num_leafs), 
-							"instead of ", count)
-				}else{
+					t.Error("Total number of leafs is", strconv.Itoa(num_leafs),
+						"instead of ", count)
+				} else {
 					output_get, err_get := ReadGetServer(key, t)
 					FailHandler((err_get != nil || int(output_get[key].(float64)) != count), t)
 				}
@@ -194,52 +212,52 @@ func TestIncr(t *testing.T){
 	}
 }
 
-func TestIncre2(t *testing.T){
+func TestIncre2(t *testing.T) {
 	// INCR using the same key and checks if the value increments properly
 	// value is an int array
 
 	// Socket connection setup
 	socket, _ := zmq.NewSocket(zmq.PUSH)
-	err := socket.Connect("tcp://localhost:"+strconv.Itoa(tcp_port))
+	err := socket.Connect("tcp://localhost:" + strconv.Itoa(tcp_port))
 	defer socket.Close()
 	SocketFailHandler(err, t)
 
 	// Wait till the leaf under key is deleted by GC
-    key := "cart.seafood.basket1.item4"
-    WaitIfExists(key, t)
+	key := "cart.seafood.basket1.item4"
+	WaitIfExists(key, t)
 
 	now := time.Now().Unix()
 	total := 0
-	for i:=0;i<3;i++{
+	for i := 0; i < 3; i++ {
 
 		// inserting leaf
 		msg := fmt.Sprintf("INCR %s %s %d", strconv.FormatInt(now, 10), key, i)
 		_, err = socket.SendBytes([]byte(msg), 0)
 		SocketSendFailHandler(err, t)
 		fmt.Printf("Sending %s...", msg)
-				
+
 		total += i
 
 		// checking output
 		output_get, err_get := ReadGetServer(key, t)
-		FailHandler((err_get != nil || int(output_get[key].(float64)) != total), t) 
-	}		
-} 
+		FailHandler((err_get != nil || int(output_get[key].(float64)) != total), t)
+	}
+}
 
-func TestAppend(t *testing.T){
+func TestAppend(t *testing.T) {
 	// Testing the APPEND function by inserting slices of int arrays
 
 	// Socket connection setup
 	socket, _ := zmq.NewSocket(zmq.PUSH)
-	err := socket.Connect("tcp://localhost:"+strconv.Itoa(tcp_port))
+	err := socket.Connect("tcp://localhost:" + strconv.Itoa(tcp_port))
 	defer socket.Close()
 	SocketFailHandler(err, t)
 
 	// Wait till the leaf under key is deleted by GC
-    key := "cart.seafood.basket1.item5"
-    WaitIfExists(key, t)
+	key := "cart.seafood.basket1.item5"
+	WaitIfExists(key, t)
 
-    // Inserting first slice
+	// Inserting first slice
 	now := time.Now().Unix()
 	value := []int{1}
 	returnVal, _ := json.Marshal(value)
@@ -266,23 +284,23 @@ func TestAppend(t *testing.T){
 	output_get, _ = ReadGetServer(key, t)
 	output_value = fmt.Sprintf("%v", output_get[key])
 	fail_cond = (output_value != "[1 2 3 4]")
-	FailHandler(fail_cond, t)	
+	FailHandler(fail_cond, t)
 }
 
-func TestAppend2(t *testing.T){
+func TestAppend2(t *testing.T) {
 	// Testing the APPEND function by inserting slices of string arrays
 
 	// Socket connection setup
 	socket, _ := zmq.NewSocket(zmq.PUSH)
-	err := socket.Connect("tcp://localhost:"+strconv.Itoa(tcp_port))
+	err := socket.Connect("tcp://localhost:" + strconv.Itoa(tcp_port))
 	defer socket.Close()
 	SocketFailHandler(err, t)
 
 	// Wait till the leaf under key is deleted by GC
-    key := "cart.seafood.basket1.item6"
-    WaitIfExists(key, t)
+	key := "cart.seafood.basket1.item6"
+	WaitIfExists(key, t)
 
-    // Inserting first slice
+	// Inserting first slice
 	now := time.Now().Unix()
 	value := []string{"abc"}
 	returnVal, _ := json.Marshal(value)
@@ -309,23 +327,23 @@ func TestAppend2(t *testing.T){
 	output_get, _ = ReadGetServer(key, t)
 	output_value = fmt.Sprintf("%v", output_get[key])
 	fail_cond = (output_value != "[abc d ef]")
-	FailHandler(fail_cond, t)	
+	FailHandler(fail_cond, t)
 }
 
-func TestAppend3(t *testing.T){
+func TestAppend3(t *testing.T) {
 	// Testing the APPEND function by inserting string arrays and ints
 
 	// Socket connection setup
 	socket, _ := zmq.NewSocket(zmq.PUSH)
-	err := socket.Connect("tcp://localhost:"+strconv.Itoa(tcp_port))
+	err := socket.Connect("tcp://localhost:" + strconv.Itoa(tcp_port))
 	defer socket.Close()
 	SocketFailHandler(err, t)
 
 	// Wait till the leaf under key is deleted by GC
-    key := "cart.seafood.basket1.item7"
-    WaitIfExists(key, t)
+	key := "cart.seafood.basket1.item7"
+	WaitIfExists(key, t)
 
-    // Inserting first slice
+	// Inserting first slice
 	now := time.Now().Unix()
 	value := []int{1, 2}
 	returnVal, _ := json.Marshal(value)
@@ -349,23 +367,23 @@ func TestAppend3(t *testing.T){
 	FailHandler(fail_cond, t)
 }
 
-func TestDuplicatesAppend(t *testing.T){
+func TestDuplicatesAppend(t *testing.T) {
 	// APPEND the same value to the same key
 
 	// Socket connection setup
 	socket, _ := zmq.NewSocket(zmq.PUSH)
-	err := socket.Connect("tcp://localhost:"+strconv.Itoa(tcp_port))
+	err := socket.Connect("tcp://localhost:" + strconv.Itoa(tcp_port))
 	defer socket.Close()
 	SocketFailHandler(err, t)
 
 	// Wait till the leaf under key is deleted by GC
-    key := "cart.seafood.basket1.item8"
-    WaitIfExists(key, t)
+	key := "cart.seafood.basket1.item8"
+	WaitIfExists(key, t)
 
 	now := time.Now().Unix()
 	value := []int{5}
 	msg := fmt.Sprintf("APPEND %s %s %d", strconv.FormatInt(now, 10), key, value)
-	for i:=0;i<2;i++{
+	for i := 0; i < 2; i++ {
 
 		// Inserting leaf
 		_, err = socket.SendBytes([]byte(msg), 0)
@@ -375,38 +393,42 @@ func TestDuplicatesAppend(t *testing.T){
 		// Checking output
 		output_get, _ := ReadGetServer(key, t)
 		output_value := fmt.Sprintf("%v", output_get[key])
-		if (i==0){ FailHandler((output_value != "[5]"), t) } 
-		if (i==1){ FailHandler((output_value != "[5 5]"), t) }
-	}	
+		if i == 0 {
+			FailHandler((output_value != "[5]"), t)
+		}
+		if i == 1 {
+			FailHandler((output_value != "[5 5]"), t)
+		}
+	}
 }
 
-func TestParamT(t *testing.T){
+func TestParamT(t *testing.T) {
 	// Testing the "t" parameter by querying t={timestamp1},{timestamp2}...
 
 	// Socket connection setup
 	socket, _ := zmq.NewSocket(zmq.PUSH)
-	err := socket.Connect("tcp://localhost:"+strconv.Itoa(tcp_port))
+	err := socket.Connect("tcp://localhost:" + strconv.Itoa(tcp_port))
 	defer socket.Close()
 	SocketFailHandler(err, t)
 
 	// Wait till the leaf under key is deleted by GC
-    key := "cart.seafood.basket1.item9"
-    WaitIfExists(key, t)
+	key := "cart.seafood.basket1.item9"
+	WaitIfExists(key, t)
 
-    // Inserting slices
-    now := time.Now().Unix()
-    for i:=0;i<3;i++{
-    	ts := now+int64(i)
+	// Inserting slices
+	now := time.Now().Unix()
+	for i := 0; i < 3; i++ {
+		ts := now + int64(i)
 		value := []int{i}
 		returnVal, _ := json.Marshal(value)
 		msg := fmt.Sprintf("APPEND %s %s %s", strconv.FormatInt(ts, 10), key, returnVal)
 		_, err = socket.SendBytes([]byte(msg), 0)
 		SocketSendFailHandler(err, t)
 		fmt.Printf("Sending %s..(GOOD)\n", msg)
-    }
+	}
 
 	// Checking output, t={now}
-	query := fmt.Sprintf("cart.seafood.basket1.*&t=%d",now)
+	query := fmt.Sprintf("cart.seafood.basket1.*&t=%d", now)
 	output_get, _ := ReadGetServer(query, t)
 	output_value := fmt.Sprintf("%v", output_get["item9"])
 	fmt.Printf("Verifying output of t=%d...", now)
@@ -422,32 +444,32 @@ func TestParamT(t *testing.T){
 	FailHandler(fail_cond, t)
 }
 
-func TestParamI(t *testing.T){
+func TestParamI(t *testing.T) {
 	// Testing the "i" parameter by querying i=2...
 
 	// Socket connection setup
 	socket, _ := zmq.NewSocket(zmq.PUSH)
-	err := socket.Connect("tcp://localhost:"+strconv.Itoa(tcp_port))
+	err := socket.Connect("tcp://localhost:" + strconv.Itoa(tcp_port))
 	defer socket.Close()
 	SocketFailHandler(err, t)
 
 	// Wait till the leaf under key is deleted by GC
-    key := "cart.seafood.basket1.item10"
-    WaitIfExists(key, t)
+	key := "cart.seafood.basket1.item10"
+	WaitIfExists(key, t)
 
-    now := time.Now().Unix()
-	for i:=0;i<2;i++{
+	now := time.Now().Unix()
+	for i := 0; i < 2; i++ {
 
 		// inserting leaf
 		msg := fmt.Sprintf("INCR %s %s %d", strconv.FormatInt(now+int64(i), 10), key, i)
 		_, err = socket.SendBytes([]byte(msg), 0)
 		SocketSendFailHandler(err, t)
 		fmt.Printf("Sending %s...(GOOD)\n", msg)
-	}		
+	}
 
 	// checking output
-	key = key+"&i=2"
+	key = key + "&i=2"
 	output_get, err_get := ReadGetServer(key, t)
 	fmt.Printf("Verifying output of i=2...")
-	FailHandler((err_get != nil || output_get[key].(float64) != 0.25), t) 
+	FailHandler((err_get != nil || output_get[key].(float64) != 0.25), t)
 }

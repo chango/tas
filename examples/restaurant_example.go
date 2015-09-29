@@ -11,23 +11,19 @@
 // burgerking/Locations
 // burgerking/info/
 // burgerking/info/news
-// burgerking/info/company-info 
-
+// burgerking/info/company-info
 
 package main
 
-
 import (
 	"fmt"
-	"time"
-	"math/rand"
+	zmq "github.com/pebbe/zmq3"
 	"log"
-	"strings"
+	"math/rand"
 	"strconv"
-	zmq "github.com/pebbe/zmq2"
+	"strings"
+	"time"
 )
-
-
 
 func inputData(data string, socket *zmq.Socket) {
 	_, err := socket.SendBytes([]byte(data), 0)
@@ -41,7 +37,7 @@ func createRequest(urlRequest string) string {
 
 	//Lets get the timestamp so we can time when this request was made
 	//Randomize the timestamp to make the STATS page useful
-	now := strconv.FormatInt(time.Now().Unix() + int64(rand.Intn(10)), 10)
+	now := strconv.FormatInt(time.Now().Unix()+int64(rand.Intn(10)), 10)
 	// Replace the / with . because that's how the tas enters data in a tree format
 	urlRequest = strings.Replace(urlRequest, "/", ".", -1)
 	msg := fmt.Sprintf("INCR %s %s %d", now, urlRequest, 1)
@@ -49,14 +45,13 @@ func createRequest(urlRequest string) string {
 	return msg
 
 }
-func main () {
-	
+func main() {
+
 	urls := [12]string{"burgerking", "burgerking/Menu",
 		"burgerking/Menu/Breakfast", "burgerking/Menu/Lunch", "burgerking/Menu/Dinner",
 		"burgerking/Menu/Snacks", "burgerking/Offers/fresh-offers", "burgerking/Offers/signup",
-		"burgerking/Locations", "burgerking/info", "burgerking/info/news", 
+		"burgerking/Locations", "burgerking/info", "burgerking/info/news",
 		"burgerkinginfo/company-info"}
-
 
 	socket, _ := zmq.NewSocket(zmq.PUSH)
 	defer socket.Close()
@@ -69,8 +64,8 @@ func main () {
 	}
 
 	//Lets say we got 100 url requests
-	
-	for c:=0; c < 100; c++ {
+
+	for c := 0; c < 100; c++ {
 		index := rand.Intn(len(urls))
 		url := urls[index]
 		request := createRequest(url)
@@ -79,5 +74,5 @@ func main () {
 	}
 
 	//Wait some time so the server can pull the request
-	time.Sleep(3*time.Second)
+	time.Sleep(3 * time.Second)
 }
