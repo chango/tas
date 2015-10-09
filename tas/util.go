@@ -2,6 +2,8 @@ package tas
 
 import (
 	"fmt"
+	"log"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -78,4 +80,36 @@ func TSCounters(timestamps *map[string]*tree.Node) string {
 	}
 	output = strings.TrimRight(output, ",")
 	return output
+}
+
+// Small wrapper for debug logging
+type debug struct {
+	debug bool
+}
+
+func (d *debug) SetLogLevel() {
+	val := os.GetEnv("DEBUG")
+	if val == "1" {
+		d.debug = true
+	}
+}
+
+func (d *debug) Debug(v ...interface{}) {
+	if d.debug {
+		output := []interface{}{"DEBUG:"}
+		output = append(output, v...)
+		log.Println(output...)
+	}
+}
+
+func (d *debug) Info(v ...interface{}) {
+	output := []interface{}{"INFO:"}
+	output = append(output, v...)
+	log.Println(output...)
+}
+
+var tasLog debug = &debug{}
+
+func init() {
+	debug.SetLogLevel()
 }
