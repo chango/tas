@@ -88,7 +88,7 @@ type debug struct {
 }
 
 func (d *debug) SetLogLevel() {
-	val := os.GetEnv("DEBUG")
+	val := os.Getenv("DEBUG")
 	if val == "1" {
 		d.debug = true
 	}
@@ -108,8 +108,8 @@ func (d *debug) Info(v ...interface{}) {
 	log.Println(output...)
 }
 
-var tasLog debug = &debug{}
+var tasLog = &debug{}
 
 func init() {
-	debug.SetLogLevel()
+	tasLog.SetLogLevel()
 }

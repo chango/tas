@@ -67,6 +67,7 @@ func (t *TASServer) Run() {
 func (t *TASServer) receiver() {
 	var data interface{}
 	var rawMessage string
+	var err error
 
 	defer func() {
 		if r := recover(); r != nil {
