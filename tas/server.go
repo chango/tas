@@ -56,27 +56,35 @@ func (t *TASServer) Run() {
 	signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
 	select {
 	case <-c:
-		log.Println("[tas] Stopping server")
+		tasLog.Info("[tas] Stopping server")
 		t.close()
 		break
 	}
-	log.Println("[tas] Server stopped")
-
+	tasLog.Info("[tas] Server stopped")
 }
 
 // ZMQ Receiver
 func (t *TASServer) receiver() {
 	var data interface{}
-	log.Println("[tas] Starting receiver")
+	var rawMessage string
+
+	defer func() {
+		if r := recover(); r != nil {
+			tasLog.Info("TAS Panic", rawMessage, r)
+		}
+	}()
+
+	tasLog.Info("[tas] Starting receiver")
 	for {
 		// incoming message format:
 		// INCR/APPEND TS KEY VALUE
 		if t.closing {
 			return
 		}
-		rawMessage, err := t.socket.Recv(0)
+		rawMessage, err = t.socket.Recv(0)
+		tasLog.Debug(rawMessage)
 		if err != nil {
-			log.Println("[tas] ZMQ receive error ", err)
+			tasLog.Info("[tas] ZMQ receive error ", err)
 			continue
 		}
 		message := strings.SplitN(rawMessage, " ", 4)
