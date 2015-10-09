@@ -70,7 +70,7 @@ func (t *TASServer) receiver() {
 
 	defer func() {
 		if r := recover(); r != nil {
-			tasLog.Debug("TAS Panic", rawMessage, r)
+			tasLog.Info("TAS Panic", rawMessage, r)
 		}
 	}()
 
