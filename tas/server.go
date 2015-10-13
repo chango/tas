@@ -69,12 +69,6 @@ func (t *TASServer) receiver() {
 	var rawMessage string
 	var err error
 
-	defer func() {
-		if r := recover(); r != nil {
-			tasLog.Info("TAS Panic", rawMessage, r)
-		}
-	}()
-
 	tasLog.Info("[tas] Starting receiver")
 	for {
 		// incoming message format:
@@ -88,19 +82,30 @@ func (t *TASServer) receiver() {
 			tasLog.Info("[tas] ZMQ receive error ", err)
 			continue
 		}
-		message := strings.SplitN(rawMessage, " ", 4)
-		if message[0] == "INCR" {
-			value, e := strconv.Atoi(message[3])
-			if e == nil {
-				t.pfdTree.AddData(message[2], value, message[1])
-			}
-		} else if message[0] == "APPEND" {
-			e := json.Unmarshal([]byte(message[3]), &data)
-			if e == nil {
-				t.pfdTree.AddData(message[2], data, message[1])
-			}
+		t.process(rawMessage)
+	}
+}
+
+func (t *TASServer) process(rawMessage string) {
+	defer func() {
+		if r := recover(); r != nil {
+			tasLog.Info("TAS Panic", rawMessage, r)
+		}
+	}()
+
+	message := strings.SplitN(rawMessage, " ", 4)
+	if message[0] == "INCR" {
+		value, e := strconv.Atoi(message[3])
+		if e == nil {
+			t.pfdTree.AddData(message[2], value, message[1])
+		}
+	} else if message[0] == "APPEND" {
+		e := json.Unmarshal([]byte(message[3]), &data)
+		if e == nil {
+			t.pfdTree.AddData(message[2], data, message[1])
 		}
 	}
+
 }
 
 // Agent that runs a GC on all the child nodes every 4 seconds
