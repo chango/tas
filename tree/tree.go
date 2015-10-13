@@ -4,9 +4,9 @@ import "strings"
 
 // For testing functions
 import (
-		"time"
-		"strconv"
-		"math"
+	"math"
+	"strconv"
+	"time"
 )
 
 type Tree struct {
@@ -61,7 +61,7 @@ func (t *Tree) DoGC(ts string) {
 		}
 		i++
 	}
-	
+
 	for _, c := range keysToDelete {
 		tsNode.DeleteChild(c)
 	}
@@ -69,7 +69,7 @@ func (t *Tree) DoGC(ts string) {
 }
 
 func (t *Tree) CheckGCRunning() bool {
-// Check if there is anything in the pfdTree older than 70 seconds. 
+	// Check if there is anything in the pfdTree older than 70 seconds.
 
 	roundToNearest := 5
 
@@ -84,25 +84,24 @@ func (t *Tree) CheckGCRunning() bool {
 	return true
 }
 
-func (t *Tree) GetOldestTS() int{
+func (t *Tree) GetOldestTS() int {
 
-    	//Get all the timestamp nodes map[timestamp]*node		
-		timestamps := t.Timestamps()
-		//no time stamps so return 0
-		if len(*timestamps) == 0 {
-			return 0
+	//Get all the timestamp nodes map[timestamp]*node
+	timestamps := t.Timestamps()
+	//no time stamps so return 0
+	if len(*timestamps) == 0 {
+		return 0
+	}
+	oldestTs := math.MaxInt32
+	for k, _ := range *timestamps {
+		key, _ := strconv.Atoi(k)
+		if key < oldestTs {
+			oldestTs = key
 		}
-		oldestTs := math.MaxInt32
-		for k, _ := range *timestamps  {
-			key,_ := strconv.Atoi(k)
-			if key < oldestTs {
-				oldestTs = key
-			}
-			
-		}
-		return oldestTs
+
+	}
+	return oldestTs
 }
-
 
 type Node struct {
 	Key      string
@@ -184,7 +183,7 @@ func (n *Node) GetValue(key []string, tsList []string, intervalSeconds float64) 
 		// If one of the children of the current node is a ts node,
 		// calculate the value for the node. Else, continue to traverse
 		for _, c := range n.Children {
-			if c.HasValue() {
+			if c != nil && c.HasValue() {
 				return generateValue(n, tsList, intervalSeconds)
 			}
 		}
@@ -219,33 +218,37 @@ func (n *Node) setValue(value interface{}) {
 	}
 }
 
-func (n *Node) GetNumChildren() int{
+func (n *Node) GetNumChildren() int {
 	//Return the number of children of the node.
 	nodeArr := n.GetAllChildren()
 	return len(nodeArr)
 }
 
-func (t *Tree) GetNumLeafs() int{
+func (t *Tree) GetNumLeafs() int {
 	//Return the number of leafs in the tree.
-	if(t.TimestampNode == nil){
-		return 0;
+	if t.TimestampNode == nil {
+		return 0
 	}
 
 	var NumLeafs int
 	NumLeafs = 0
-	for _, node := range t.TimestampNode.GetAllChildren(){
+	for _, node := range t.TimestampNode.GetAllChildren() {
 		NumLeafs += node.GetNumChildren()
 	}
 	return NumLeafs
 }
 
 func generateValue(n *Node, tsList []string, intervalSeconds float64) interface{} {
+	if n == nil {
+		return nil
+	}
+
 	var returnVal interface{}
 	var numDataPoints float64 = 1
 	var isInt bool = false
 
 	for _, c := range n.Children {
-		if c.HasValue() && (tsList == nil || len(tsList) == 0 || isInArray(c.Key, &tsList)) {
+		if c != nil && c.HasValue() && (tsList == nil || len(tsList) == 0 || isInArray(c.Key, &tsList)) {
 			if returnVal == nil {
 				returnVal = c.Value
 			} else if x, ok := c.Value.(int); ok {
@@ -286,4 +289,3 @@ func isInArray(item string, l *[]string) bool {
 	}
 	return false
 }
-
