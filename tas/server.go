@@ -65,7 +65,6 @@ func (t *TASServer) Run() {
 
 // ZMQ Receiver
 func (t *TASServer) receiver() {
-	var data interface{}
 	var rawMessage string
 	var err error
 
@@ -87,6 +86,7 @@ func (t *TASServer) receiver() {
 }
 
 func (t *TASServer) process(rawMessage string) {
+	var data interface{}
 	defer func() {
 		if r := recover(); r != nil {
 			tasLog.Info("TAS Panic", rawMessage, r)
